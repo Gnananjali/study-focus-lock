@@ -1,0 +1,3 @@
+<resources>
+    <string name="focus_accessibility_desc">Detects which app is open so Study Focus Lock can block distracting apps during your study sessions. It does not read screen content.</string>
+</resources>
