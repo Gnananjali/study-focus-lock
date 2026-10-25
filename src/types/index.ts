@@ -32,3 +32,23 @@ export interface Status {
   remainingMin: number;
   source: 'manual' | 'schedule' | 'none';
 }
+
+export interface Task {
+  id: string;
+  title: string;
+  startAt?: number; // epoch ms
+  endAt?: number;   // epoch ms
+  done: boolean;
+  createdAt: number;
+}
+
+export interface JournalEntry {
+  text: string;
+  mood: number; // 1-5
+  updatedAt: number;
+}
+
+export interface JournalReminder {
+  enabled: boolean;
+  minute: number; // minutes from midnight
+}

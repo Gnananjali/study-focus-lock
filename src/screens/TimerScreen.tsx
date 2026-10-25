@@ -3,6 +3,8 @@ import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import { FocusLock } from '../native/FocusLock';
 import { usePlan } from '../store/usePlan';
 import { Status } from '../types';
+import { useTasks } from '../store/useTasks';
+import { dayLabel, dayStartMs, minToStr, nextSession } from '../utils/time';
 import { C, s } from '../theme';
 
 const OPTIONS = [25, 45, 60, 90];
@@ -11,6 +13,9 @@ export default function TimerScreen() {
   const [mins, setMins] = useState(45);
   const [st, setSt] = useState<Status | null>(null);
   const plan = usePlan(p => p.plan);
+  const tasks = useTasks(t => t.tasks);
+  const next = nextSession(plan.schedules);
+  const dueSoon = tasks.filter(t => !t.done && t.endAt !== undefined && t.endAt < dayStartMs(1)).length;
 
   const refresh = useCallback(async () => setSt(await FocusLock.getStatus()), []);
   useEffect(() => {
@@ -49,6 +54,12 @@ export default function TimerScreen() {
             <Text style={s.sub}>No active session</Text>
           </>
         )}
+      </View>
+      <View style={s.card}>
+        <Text style={s.sub}>Next session</Text>
+        <Text style={s.text}>{next ? `${next.schedule.label} - ${dayLabel(next.dayOffset)} ${minToStr(next.schedule.startMinute)}` : 'Nothing scheduled'}</Text>
+        <Text style={[s.sub, { marginTop: 6 }]}>Tasks due today or overdue</Text>
+        <Text style={{ color: dueSoon ? C.bad : C.good, fontSize: 16, fontWeight: '700' }}>{dueSoon}</Text>
       </View>
       {!st?.active && (
         <>

@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <queries>
@@ -55,5 +57,6 @@
         <activity android:name="com.studyfocuslock.focus.BlockActivity" android:exported="false" android:excludeFromRecents="true"
             android:launchMode="singleTask" android:taskAffinity=""
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+            <receiver android:name="com.studyfocuslock.focus.AlarmReceiver" android:exported="false" />
     </application>
 </manifest>

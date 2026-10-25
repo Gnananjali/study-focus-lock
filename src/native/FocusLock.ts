@@ -1,5 +1,5 @@
 import { NativeModules } from 'react-native';
-import { AppInfo, FocusPlan, Status } from '../types';
+import { AppInfo, FocusPlan, JournalEntry, JournalReminder, Status, Task } from '../types';
 
 const N = NativeModules.FocusModule;
 
@@ -18,5 +18,18 @@ export const FocusLock = {
   isBatteryExempt: (): Promise<boolean> => N.isBatteryExempt(),
   requestBatteryExemption: () => N.requestBatteryExemption(),
   startService: () => N.startService(),
+  saveTasks: (t: Task[]): Promise<void> => N.saveTasks(JSON.stringify(t)),
+  loadTasks: async (): Promise<Task[]> => {
+    try { const r = await N.getItem('tasks'); return r ? JSON.parse(r) : []; } catch { return []; }
+  },
+  loadJournal: async (): Promise<Record<string, JournalEntry>> => {
+    try { const r = await N.getItem('journal'); return r ? JSON.parse(r) : {}; } catch { return {}; }
+  },
+  saveJournal: (j: Record<string, JournalEntry>): Promise<void> => N.setItem('journal', JSON.stringify(j)),
+  getJournalReminder: async (): Promise<JournalReminder> => {
+    try { const r = await N.getItem('journal_reminder'); return r ? JSON.parse(r) : { enabled: true, minute: 1260 }; }
+    catch { return { enabled: true, minute: 1260 }; }
+  },
+  setJournalReminder: (enabled: boolean, minute: number): Promise<void> => N.setJournalReminder(enabled, minute),
   getStats: async (): Promise<Record<string, number>> => JSON.parse(await N.getStats()),
 };

@@ -33,4 +33,9 @@ object FocusStore {
         }
         return o.toString()
     }
+
+    fun kvGet(c: Context, k: String): String? = prefs(c).getString("kv_$k", null)
+    fun kvSet(c: Context, k: String, v: String) = prefs(c).edit().putString("kv_$k", v).apply()
+    fun lastNotifiedEnd(c: Context): Long = prefs(c).getLong("lastEnd", 0L)
+    fun setLastNotifiedEnd(c: Context, v: Long) = prefs(c).edit().putLong("lastEnd", v).apply()
 }

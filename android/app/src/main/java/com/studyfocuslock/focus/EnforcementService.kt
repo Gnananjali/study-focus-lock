@@ -34,6 +34,7 @@ class EnforcementService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         handler.removeCallbacks(tick)
         handler.postDelayed(tick, 30_000)
+        AlarmScheduler.scheduleAll(this)
         return START_STICKY
     }
 

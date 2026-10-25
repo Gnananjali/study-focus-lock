@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
 import com.facebook.react.bridge.*
+import org.json.JSONObject
 
 class FocusModule(private val rc: ReactApplicationContext) : ReactContextBaseJavaModule(rc) {
     override fun getName() = "FocusModule"
@@ -16,7 +17,7 @@ class FocusModule(private val rc: ReactApplicationContext) : ReactContextBaseJav
 
     @ReactMethod fun savePlan(json: String, p: Promise) {
         if (locked()) { p.reject("LOCKED", "Plan is locked while a focus session is running."); return }
-        FocusStore.savePlan(rc, json); p.resolve(null)
+        FocusStore.savePlan(rc, json); AlarmScheduler.scheduleSessionEnd(rc); p.resolve(null)
     }
 
     @ReactMethod fun loadPlan(p: Promise) = p.resolve(FocusStore.planString(rc))
@@ -24,6 +25,7 @@ class FocusModule(private val rc: ReactApplicationContext) : ReactContextBaseJav
     @ReactMethod fun startManualSession(minutes: Int, p: Promise) {
         if (locked()) { p.reject("LOCKED", "A session is already running."); return }
         FocusStore.setManualEnd(rc, System.currentTimeMillis() + minutes * 60_000L)
+        AlarmScheduler.scheduleSessionEnd(rc)
         EnforcementService.start(rc)
         p.resolve(null)
     }
@@ -76,4 +78,14 @@ class FocusModule(private val rc: ReactApplicationContext) : ReactContextBaseJav
 
     @ReactMethod fun startService() = EnforcementService.start(rc)
     @ReactMethod fun getStats(p: Promise) = p.resolve(FocusStore.statsJson(rc))
+
+    @ReactMethod fun getItem(key: String, p: Promise) = p.resolve(FocusStore.kvGet(rc, key))
+    @ReactMethod fun setItem(key: String, value: String, p: Promise) { FocusStore.kvSet(rc, key, value); p.resolve(null) }
+    @ReactMethod fun saveTasks(json: String, p: Promise) {
+        FocusStore.kvSet(rc, "tasks", json); AlarmScheduler.scheduleTasks(rc); p.resolve(null)
+    }
+    @ReactMethod fun setJournalReminder(enabled: Boolean, minute: Int, p: Promise) {
+        FocusStore.kvSet(rc, "journal_reminder", JSONObject().put("enabled", enabled).put("minute", minute).toString())
+        AlarmScheduler.scheduleJournal(rc); p.resolve(null)
+    }
 }
